@@ -159,6 +159,7 @@ const (
 	vnetResourceGroupField            = "vnetresourcegroup"
 	vnetNameField                     = "vnetname"
 	vnetLinkNameField                 = "vnetlinkname"
+	privateDnsResourceGroupField      = "privatednsresourcegroup"
 	subnetNameField                   = "subnetname"
 	shareNamePrefixField              = "sharenameprefix"
 	requireInfraEncryptionField       = "requireinfraencryption"

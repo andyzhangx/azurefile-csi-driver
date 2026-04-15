@@ -121,7 +121,7 @@ func (d *Driver) CreateVolume(ctx context.Context, req *csi.CreateVolumeRequest)
 	var sku, subsID, resourceGroup, location, account, fileShareName, diskName, fsType, secretName string
 	var secretNamespace, pvcNamespace, protocol, customTags, storageEndpointSuffix, networkEndpointType, shareAccessTier, accountAccessTier, rootSquashType, tagValueDelimiter string
 	var createAccount, useSeretCache, matchTags, selectRandomMatchingAccount, getLatestAccountKey, encryptInTransit, mountWithManagedIdentity, mountWithWIToken bool
-	var vnetResourceGroup, vnetName, vnetLinkName, publicNetworkAccess, subnetName, shareNamePrefix, fsGroupChangePolicy, useDataPlaneAPI string
+	var vnetResourceGroup, vnetName, vnetLinkName, publicNetworkAccess, subnetName, shareNamePrefix, fsGroupChangePolicy, useDataPlaneAPI, privateDnsResourceGroup string
 	var requireInfraEncryption, disableDeleteRetentionPolicy, enableLFS, isMultichannelEnabled, allowSharedKeyAccess *bool
 	var provisionedBandwidthMibps, provisionedIops *int32
 	// set allowBlobPublicAccess as false by default
@@ -246,6 +246,8 @@ func (d *Driver) CreateVolume(ctx context.Context, req *csi.CreateVolumeRequest)
 			}
 		case vnetResourceGroupField:
 			vnetResourceGroup = v
+		case privateDnsResourceGroupField:
+			privateDnsResourceGroup = v
 		case vnetNameField:
 			vnetName = v
 		case vnetLinkNameField:
@@ -560,6 +562,7 @@ func (d *Driver) CreateVolume(ctx context.Context, req *csi.CreateVolumeRequest)
 		AllowSharedKeyAccess:                    allowSharedKeyAccess,
 		PublicNetworkAccess:                     publicNetworkAccess,
 		VNetResourceGroup:                       vnetResourceGroup,
+		PrivateDNSZoneResourceGroup:             privateDnsResourceGroup,
 		VNetName:                                vnetName,
 		VNetLinkName:                            vnetLinkName,
 		SubnetName:                              subnetName,
