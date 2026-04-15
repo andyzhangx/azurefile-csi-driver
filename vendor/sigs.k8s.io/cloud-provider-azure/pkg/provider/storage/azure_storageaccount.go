@@ -369,9 +369,6 @@ func (az *AccountRepo) EnsureStorageAccount(ctx context.Context, accountOptions 
 	}
 
 	privateDNSZoneName := defaultPrivateDNSZoneName
-	if accountOptions.PrivateDNSZoneName != "" {
-		privateDNSZoneName = accountOptions.PrivateDNSZoneName
-	}
 	if ptr.Deref(accountOptions.CreatePrivateEndpoint, false) {
 		if accountOptions.StorageType == "" {
 			logger.V(2).Info("set StorageType as file when not specified")
@@ -381,7 +378,9 @@ func (az *AccountRepo) EnsureStorageAccount(ctx context.Context, accountOptions 
 		if len(accountOptions.StorageEndpointSuffix) == 0 && az.Environment != nil {
 			accountOptions.StorageEndpointSuffix = az.Environment.StorageEndpointSuffix
 		}
-		privateDNSZoneName = fmt.Sprintf(privateDNSZoneNameFmt, privateDNSZoneName, accountOptions.StorageType, accountOptions.StorageEndpointSuffix)
+		// Private Endpoint DNS resolution requires the fixed "privatelink" prefix,
+		// ignore user-specified PrivateDNSZoneName to prevent broken CNAME chain.
+		privateDNSZoneName = fmt.Sprintf(privateDNSZoneNameFmt, defaultPrivateDNSZoneName, accountOptions.StorageType, accountOptions.StorageEndpointSuffix)
 	}
 
 	if len(accountOptions.Tags) == 0 {
