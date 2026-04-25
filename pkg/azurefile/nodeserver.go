@@ -94,6 +94,28 @@ func (d *Driver) NodePublishVolume(ctx context.Context, req *csi.NodePublishVolu
 			return &csi.NodePublishVolumeResponse{}, err
 		}
 
+		// mountWithOAuthToken: refresh OAuth token from secret without re-mounting
+		if strings.EqualFold(getValueInMap(context, mountWithOAuthTokenField), trueValue) {
+			server := getValueInMap(context, serverNameField)
+			if server == "" {
+				accountName := getValueInMap(context, storageAccountField)
+				storageEndpointSuffix := getValueInMap(context, storageEndpointSuffixField)
+				if storageEndpointSuffix == "" {
+					storageEndpointSuffix = "core.windows.net"
+				}
+				if accountName != "" {
+					server = fmt.Sprintf("%s.file.%s", accountName, storageEndpointSuffix)
+				}
+			}
+			if server != "" {
+				if err := d.setCredentialCacheWithOAuthToken(ctx, server, context); err != nil {
+					klog.Warningf("NodePublishVolume: failed to refresh OAuth token for volume(%s): %v", volumeID, err)
+				} else {
+					klog.V(2).Infof("NodePublishVolume: refreshed OAuth token credential cache for volume(%s) server(%s)", volumeID, server)
+				}
+			}
+		}
+
 		// ephemeral volume
 		if strings.EqualFold(context[ephemeralField], trueValue) {
 			setKeyValueInMap(context, secretNamespaceField, context[podNamespaceField])
